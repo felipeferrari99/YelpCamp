@@ -1,0 +1,32 @@
+version: '3'
+services:
+  node:
+    build: .
+    container_name: node
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/scr/app
+    networks:
+      - myNetwork
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql_db
+    ports: 
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: "yelpCamp"
+    networks:
+      - myNetwork
+
+networks:
+  myNetwork:
+
+volumes:
+  db:
