@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
-const path = require("path")
+const path = require("path");
 const port = 3000;
-const methodOverride = require("method-override")
+const ejsMate = require("ejs-mate");
+const methodOverride = require("method-override");
 var connection = require('./database/db.js');
 
+app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded( {extended: true}));
@@ -25,8 +27,8 @@ app.get('/campgrounds/new', (req, res) => {
 })
   
 app.post('/campgrounds', (req, res) => {
-    const { title, price, description, location } = req.body;
-    connection.query('INSERT INTO campgrounds (title, price, description, location) VALUES (?, ?, ?, ?)', [title, price, description, location], function (err, result) {
+    const { title, image, price, description, location } = req.body;
+    connection.query('INSERT INTO campgrounds (title, image, price, description, location) VALUES (?, ?, ?, ?, ?)', [title, image, price, description, location], function (err, result) {
     if (err) {
         console.log("NOT ALLOWED!!!")
     } else {

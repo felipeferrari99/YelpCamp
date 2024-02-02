@@ -1,33 +1,30 @@
 const connection = require('../database/db');
 const tableName = 'campgrounds';
+const imageSource = 'https://source.unsplash.com/collection/483251';
+
+const titles = ['Riverside Retreat', 'Mountain View Campsite', 'Forest Haven Camping', 'Lakefront Escape', 'Sunset Campground', 'Pine Grove Camping', 'Valley Vista Campsite', 'Desert Oasis Campground', 'Creek Side Retreat', 'Hilltop Haven Camping', 'Meadowland Campsite', 'Starlight Camping', 'Seaside Serenity Campground', 'Wildflower Campsite', 'Tranquil Trail Campground', 'Canyon Edge Camping', 'Misty Mountain Campsite', 'Riverbank Rendezvous Camping', 'Lakeside Bliss Campground', 'Whispering Pines Campsite'];
+
+const locations = ['New York, New York', 'Los Angeles, California', 'Chicago, Illinois', 'Houston, Texas', 'Phoenix, Arizona', 'Philadelphia, Pennsylvania', 'San Antonio, Texas', 'San Diego, California', 'Dallas, Texas', 'San Jose, California', 'Austin, Texas', 'Jacksonville, Florida', 'Fort Worth, Texas', 'Columbus, Ohio', 'San Francisco, California', 'Charlotte, North Carolina', 'Indianapolis, Indiana', 'Seattle, Washington', 'Denver, Colorado', 'Washington, District of Columbia'];
+
+const descriptions = ['A peaceful camping spot by the river.', 'Enjoy stunning mountain views at this campsite.', 'Immerse yourself in nature at this serene forest campsite.', 'Camp by the lake and experience tranquility.', 'Watch breathtaking sunsets from your campsite.', 'Surrounded by tall pine trees, this campground offers a peaceful retreat.', 'Overlook the valley from this scenic camping spot.', 'Experience the beauty of the desert at this oasis campsite.', 'Camp beside a babbling creek for a soothing experience.', 'Set up your tent on a hilltop for panoramic views.', 'Camp in a peaceful meadow and connect with nature.', 'Stargaze from your campsite at this remote location.', 'Enjoy the sound of waves at this seaside campsite.', 'Surrounded by wildflowers, this campsite offers a colorful retreat.', 'Discover tranquility on the hiking trails near this campsite.', 'Camp on the edge of a canyon for a thrilling experience.', 'Wake up to misty mountain views at this picturesque campground.', 'Set up your tent along the riverbank for a memorable stay.', 'Experience lakeside bliss at this idyllic camping spot.', 'Listen to the whispers of the pines at this serene campground.'];
 
 function insertSeedData() {
-  const campgrounds = [
-    { title: 'Riverside Retreat', price: 19.99, description: 'A peaceful camping spot by the river.', location: 'New York, New York' },
-    { title: 'Mountain View Campsite', price: 29.99, description: 'Enjoy stunning mountain views at this campsite.', location: 'Los Angeles, California' },
-    { title: 'Forest Haven Camping', price: 14.99, description: 'Immerse yourself in nature at this serene forest campsite.', location: 'Chicago, Illinois' },
-    { title: 'Lakefront Escape', price: 39.99, description: 'Camp by the lake and experience tranquility.', location: 'Houston, Texas' },
-    { title: 'Sunset Campground', price: 24.99, description: 'Watch breathtaking sunsets from your campsite.', location: 'Phoenix, Arizona' },
-    { title: 'Pine Grove Camping', price: 49.99, description: 'Surrounded by tall pine trees, this campground offers a peaceful retreat.', location: 'Philadelphia, Pennsylvania' },
-    { title: 'Valley Vista Campsite', price: 34.99, description: 'Overlook the valley from this scenic camping spot.', location: 'San Antonio, Texas' },
-    { title: 'Desert Oasis Campground', price: 59.99, description: 'Experience the beauty of the desert at this oasis campsite.', location: 'San Diego, California' },
-    { title: 'Creek Side Retreat', price: 44.99, description: 'Camp beside a babbling creek for a soothing experience.', location: 'Dallas, Texas' },
-    { title: 'Hilltop Haven Camping', price: 69.99, description: 'Set up your tent on a hilltop for panoramic views.', location: 'San Jose, California' },
-    { title: 'Meadowland Campsite', price: 54.99, description: 'Camp in a peaceful meadow and connect with nature.', location: 'Austin, Texas' },
-    { title: 'Starlight Camping', price: 79.99, description: 'Stargaze from your campsite at this remote location.', location: 'Jacksonville, Florida' },
-    { title: 'Seaside Serenity Campground', price: 64.99, description: 'Enjoy the sound of waves at this seaside campsite.', location: 'Fort Worth, Texas' },
-    { title: 'Wildflower Campsite', price: 89.99, description: 'Surrounded by wildflowers, this campsite offers a colorful retreat.', location: 'Columbus, Ohio' },
-    { title: 'Tranquil Trail Campground', price: 74.99, description: 'Discover tranquility on the hiking trails near this campsite.', location: 'San Francisco, California' },
-    { title: 'Canyon Edge Camping', price: 99.99, description: 'Camp on the edge of a canyon for a thrilling experience.', location: 'Charlotte, North Carolina' },
-    { title: 'Misty Mountain Campsite', price: 84.99, description: 'Wake up to misty mountain views at this picturesque campground.', location: 'Indianapolis, Indiana' },
-    { title: 'Riverbank Rendezvous Camping', price: 119.99, description: 'Set up your tent along the riverbank for a memorable stay.', location: 'Seattle, Washington' },
-    { title: 'Lakeside Bliss Campground', price: 104.99, description: 'Experience lakeside bliss at this idyllic camping spot.', location: 'Denver, Colorado' },
-    { title: 'Whispering Pines Campsite', price: 139.99, description: 'Listen to the whispers of the pines at this serene campground.', location: 'Washington, District of Columbia' }
-  ];
+  const campgrounds = [];
 
-  const insertDataSql = `INSERT INTO ${tableName} (title, price, description, location) VALUES ?`;
+  for (let i = 0; i < titles.length; i++) {
+    const price = Math.floor(Math.random() * (150 - 10 + 1) + 10);
+    campgrounds.push({
+      title: titles[i],
+      image: imageSource,
+      price: price.toFixed(2),
+      description: descriptions[i],
+      location: locations[i]
+    });
+  }
 
-connection.query(insertDataSql, [campgrounds.map(campground => [campground.title, campground.price, campground.description, campground.location])], (err, result) => {
+  const insertDataSql = `INSERT INTO ${tableName} (title, image, price, description, location) VALUES ?`;
+
+connection.query(insertDataSql, [campgrounds.map(campground => [campground.title, campground.image, campground.price, campground.description, campground.location])], (err, result) => {
   if (err) throw err;
   console.log(`${result.affectedRows} campgrounds inserted`);
   connection.end();
