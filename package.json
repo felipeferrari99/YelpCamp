@@ -3,6 +3,7 @@
         "start": "nodemon app.js"
     },
     "dependencies": {
+        "bcrypt": "^5.1.1",
         "connect-flash": "^0.1.1",
         "ejs": "^3.1.9",
         "ejs-mate": "^4.0.0",
@@ -10,6 +11,8 @@
         "express-session": "^1.18.0",
         "joi": "^17.12.1",
         "method-override": "^3.0.0",
-        "mysql2": "^3.9.1"
+        "mysql2": "^3.9.1",
+        "passport": "^0.7.0",
+        "passport-local": "^1.0.0"
     }
 }
