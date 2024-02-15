@@ -10,7 +10,9 @@ con.query(`SHOW TABLES LIKE '${campgroundsTableName}'`, (err, rows) => {
           image VARCHAR(255),
           price FLOAT NOT NULL,
           description VARCHAR(255),
-          location VARCHAR(255) NOT NULL
+          location VARCHAR(255) NOT NULL,
+          author INT NOT NULL,
+          FOREIGN KEY (author) REFERENCES users(id)
         )`;
       
       con.query(createCampgroundsTableSql, (err, result) => {

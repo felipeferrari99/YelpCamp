@@ -5,20 +5,9 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require("passport-local").Strategy;
 const catchAsync = require('../utils/catchAsync');
-const ExpressError = require('../utils/ExpressError');
-const {userSchema} = require('../schemas.js');
-const con = require('../database/db.js');
+const con = require('../database/db');
 const { userExists, hashPassword } = require('../models/user');
-
-const validateUser = (req, res, next) => {
-  const {error} = userSchema.validate(req.body);
-  if(error) {
-    const msg = error.details.map(el => el.message).join(',');
-    throw new ExpressError(msg, 400);
-  } else {
-    next();
-  }
-}
+const { storeReturnTo, validateUser } = require('../middleware');
 
 router.get('/register', function(req, res, next) {
   res.render('users/register');
@@ -29,14 +18,17 @@ router.get('/login', function(req, res, next) {
   res.render('users/login', { flashMessages: flashMessages });
 });
 
-router.post('/register', validateUser, catchAsync(async (req, res) => {
+router.post('/register', validateUser, catchAsync(async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
     const existingUser = await userExists(username, email);
     const hashedPassword = await hashPassword(password);
-    con.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword], function (err) {
-      req.flash('success', 'Welcome to YelpCamp!');  
-      res.redirect('/campgrounds');
+    con.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword], function (err, registeredUser) {
+      req.login(registeredUser, err => {
+        if(err) return next(err);
+        req.flash('success', 'Welcome to YelpCamp!');
+        res.redirect('/campgrounds');
+      })
     });
   } catch (err) {
     req.flash('error', err.message);
@@ -69,9 +61,20 @@ passport.use(new LocalStrategy(async function(username, password, done) {
 passport.serializeUser(function(user, done) {done(null, user)});
 passport.deserializeUser(function(user, done) {done(null, user)});
 
-router.post('/login', passport.authenticate('local', {failureFlash: true, failureRedirect: '/login'}), function(req, res, next) {
+router.post('/login', storeReturnTo, passport.authenticate('local', {failureFlash: true, failureRedirect: '/login'}), function(req, res, next) {
   req.flash('success', 'Welcome back!');
-  res.redirect('/campgrounds');
+  const redirectUrl = res.locals.returnTo || '/campgrounds';
+  res.redirect(redirectUrl);
+});
+
+router.get('/logout', (req, res, next) => {
+  req.logout(function (err) {
+      if (err) {
+          return next(err);
+      }
+      req.flash('success', 'Goodbye!');
+      res.redirect('/campgrounds');
+  });
 });
 
 module.exports = router;

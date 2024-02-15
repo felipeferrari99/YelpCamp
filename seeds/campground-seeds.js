@@ -13,18 +13,20 @@ function insertSeedData() {
 
   for (let i = 0; i < titles.length; i++) {
     const price = Math.floor(Math.random() * (150 - 10 + 1) + 10);
+    const author = Math.floor(Math.random() * (6 - 1 + 1)) + 1;
     campgrounds.push({
       title: titles[i],
       image: imageSource,
       price: price.toFixed(2),
       description: descriptions[i],
-      location: locations[i]
+      location: locations[i],
+      author: author
     });
   }
 
-  const insertDataSql = `INSERT INTO ${tableName} (title, image, price, description, location) VALUES ?`;
+  const insertDataSql = `INSERT INTO ${tableName} (title, image, price, description, location, author) VALUES ?`;
 
-connection.query(insertDataSql, [campgrounds.map(campground => [campground.title, campground.image, campground.price, campground.description, campground.location])], (err, result) => {
+connection.query(insertDataSql, [campgrounds.map(campground => [campground.title, campground.image, campground.price, campground.description, campground.location, campground.author])], (err, result) => {
   if (err) throw err;
   console.log(`${result.affectedRows} campgrounds inserted`);
   connection.end();
