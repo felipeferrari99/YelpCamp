@@ -7,7 +7,6 @@ con.query(`SHOW TABLES LIKE '${campgroundsTableName}'`, (err, rows) => {
         CREATE TABLE ${campgroundsTableName} (
           id INT AUTO_INCREMENT PRIMARY KEY,
           title VARCHAR(255) NOT NULL,
-          image VARCHAR(255),
           price FLOAT NOT NULL,
           description VARCHAR(255),
           location VARCHAR(255) NOT NULL,

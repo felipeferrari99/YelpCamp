@@ -1,7 +1,7 @@
 const con = require('../database/db');
 
 module.exports.index = async (req, res) => {
-    con.query('SELECT * FROM campgrounds', function (err, campgrounds) {
+    con.query('SELECT campgrounds.*, (SELECT url FROM images WHERE campground_id = campgrounds.id ORDER BY id ASC LIMIT 1) AS url FROM campgrounds', (err, campgrounds) => {
       res.render('campgrounds/index', { campgrounds });
     });
 }
@@ -11,10 +11,14 @@ module.exports.renderNewForm = (req, res) => {
 };
 
 module.exports.createCampground = async (req, res) => {
-    const { title, image, price, description, location } = req.body;
+    const { title, price, description, location } = req.body;
     const author = req.user.id;
-    const [campground] = await con.promise().query('INSERT INTO campgrounds (title, image, price, description, location, author) VALUES (?, ?, ?, ?, ?, ?)', [title, image, price, description, location, author]);
+    const [campground] = await con.promise().query('INSERT INTO campgrounds (title, price, description, location, author) VALUES (?, ?, ?, ?, ?)', [title, price, description, location, author]);
     const newCampgroundId = campground.insertId;
+    const images = req.files.map(f => ({url: f.path, filename: f.filename}))
+    for(let i in images) {
+      con.query('INSERT INTO images (filename, url, campground_id) VALUES (?, ?, ?)', [images[i].filename, images[i].url, newCampgroundId]);
+    }
     req.flash('success', 'Campground successfully added!');
     res.redirect(`/campgrounds/${newCampgroundId}`);
 }
@@ -27,10 +31,12 @@ module.exports.showCampground = async (req, res) => {
             req.flash('error', 'Cannot find that campground.')
             return res.redirect('/campgrounds')
         }
-        con.query('SELECT reviews.*, users.username FROM reviews INNER JOIN users ON reviews.author = users.id WHERE campground_id = ?', id, (err, reviewResults) => {
-        const reviews = reviewResults;
-        res.render('campgrounds/show', { campground, reviews });
-    })});
+        con.query('SELECT url FROM images WHERE campground_id = ?', id, (err, imageResults) => {
+            const images = imageResults;
+            con.query('SELECT reviews.*, users.username FROM reviews INNER JOIN users ON reviews.author = users.id WHERE campground_id = ?', id, (err, reviewResults) => {
+                const reviews = reviewResults;
+                res.render('campgrounds/show', { campground, reviews, images });
+    })})});
 }
 
 module.exports.renderEditForm = async (req, res) => {
