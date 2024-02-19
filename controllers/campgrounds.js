@@ -1,4 +1,5 @@
 const con = require('../database/db');
+const { cloudinary } = require('../cloudinary');
 
 module.exports.index = async (req, res) => {
     con.query('SELECT campgrounds.*, (SELECT url FROM images WHERE campground_id = campgrounds.id ORDER BY id ASC LIMIT 1) AS url FROM campgrounds', (err, campgrounds) => {
@@ -43,13 +44,25 @@ module.exports.renderEditForm = async (req, res) => {
     const { id } = req.params;
     const [campgrounds] = await con.promise().query('SELECT * FROM campgrounds WHERE id = ?', [id]);
     const campground = campgrounds[0];
-    res.render('campgrounds/edit', { campground });
-}
+    con.query('SELECT * FROM images WHERE campground_id = ?', id, (err, imageResults) => {
+        const images = imageResults;
+        res.render('campgrounds/edit', { campground, images });
+    })}
 
 module.exports.updateCampground = async (req, res) => {
-    const { title, image, price, description, location } = req.body;
+    const { title, price, description, location } = req.body;
     const { id } = req.params;
-    await con.promise().query('UPDATE campgrounds SET title = ?, image = ?, price = ?, description = ?, location = ? WHERE id = ?', [title, image, price, description, location, id]);
+    await con.promise().query('UPDATE campgrounds SET title = ?, price = ?, description = ?, location = ? WHERE id = ?', [title, price, description, location, id]);
+    const images = req.files.map(f => ({url: f.path, filename: f.filename}))
+    for(let i in images) {
+      con.query('INSERT INTO images (filename, url, campground_id) VALUES (?, ?, ?)', [images[i].filename, images[i].url, id]);
+    }
+    if (req.body.deleteImages) {
+        for (let filename of req.body.deleteImages) {
+            await cloudinary.uploader.destroy(filename);
+        }
+        con.query('DELETE FROM images WHERE filename IN (?)', req.body.deleteImages)
+    }
     req.flash('success', 'Campground successfully updated!');
     res.redirect(`/campgrounds/${id}`);
 }
@@ -57,7 +70,13 @@ module.exports.updateCampground = async (req, res) => {
 module.exports.deleteCampground = async (req, res) => {
     const { id } = req.params;
     await con.promise().query('DELETE FROM reviews WHERE campground_id = ?', [id]);
+    const filenames = await con.promise().query('SELECT filename FROM images WHERE campground_id = ?', [id]);
+    for (let i = 0; i < filenames[0].length; i++) {
+      let { filename } = filenames[0][i];
+      await cloudinary.uploader.destroy(filename);
+      await con.promise().query('DELETE FROM images WHERE filename = ?', [filename]);
+    }
     await con.promise().query('DELETE FROM campgrounds WHERE id = ?', [id]);
     req.flash('success', 'Campground successfully deleted!');
     res.redirect('/campgrounds');
-}
+  };
