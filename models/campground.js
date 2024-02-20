@@ -10,6 +10,8 @@ con.query(`SHOW TABLES LIKE '${campgroundsTableName}'`, (err, rows) => {
           price FLOAT NOT NULL,
           description VARCHAR(255),
           location VARCHAR(255) NOT NULL,
+          longitude DECIMAL(9, 6) NOT NULL,
+          latitude DECIMAL(9, 6) NOT NULL,
           author INT NOT NULL,
           FOREIGN KEY (author) REFERENCES users(id)
         )`;

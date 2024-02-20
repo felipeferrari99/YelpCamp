@@ -10,6 +10,9 @@ const filenames = ['YelpCamp/lglwo7v8ppuvocjtxk9e', 'YelpCamp/n9eil9fui7nuelq5hw
 
 const urls = ['https://res.cloudinary.com/dsv8lpacy/image/upload/v1708356803/YelpCamp/lglwo7v8ppuvocjtxk9e.png', 'https://res.cloudinary.com/dsv8lpacy/image/upload/v1708356804/YelpCamp/n9eil9fui7nuelq5hw7d.png', 'https://res.cloudinary.com/dsv8lpacy/image/upload/v1708356804/YelpCamp/wxppvgqoajcuqwqoie3b.jpg'];
 
+const longitude = -77.036543;
+const latitude = 38.895037;
+
 const extendedFilenames = [];
 const extendedUrls = [];
 
@@ -29,17 +32,19 @@ connection.query(`SELECT COUNT(*) AS count FROM campgrounds`, (err, rows) => {
 
         for (let i = 0; i < 20; i++) {
             const price = Math.floor(Math.random() * (150 - 10 + 1) + 10);
-            const author = Math.floor(Math.random() * (6 - 1 + 1)) + 1;
+            const author = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
             campgrounds.push([
                 titles[i],
                 price.toFixed(2),
                 descriptions[i],
                 locations[i],
+                longitude,
+                latitude,
                 author
             ]);
         }
 
-        connection.query(`INSERT INTO campgrounds (title, price, description, location, author) VALUES ?`, [campgrounds], (err, result) => {
+        connection.query(`INSERT INTO campgrounds (title, price, description, location, longitude, latitude, author) VALUES ?`, [campgrounds], (err, result) => {
             if (err) throw err;
             console.log(`${result.affectedRows} campgrounds inserted`);
 
