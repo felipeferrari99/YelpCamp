@@ -10,8 +10,8 @@ const filenames = ['YelpCamp/lglwo7v8ppuvocjtxk9e', 'YelpCamp/n9eil9fui7nuelq5hw
 
 const urls = ['https://res.cloudinary.com/dsv8lpacy/image/upload/v1708356803/YelpCamp/lglwo7v8ppuvocjtxk9e.png', 'https://res.cloudinary.com/dsv8lpacy/image/upload/v1708356804/YelpCamp/n9eil9fui7nuelq5hw7d.png', 'https://res.cloudinary.com/dsv8lpacy/image/upload/v1708356804/YelpCamp/wxppvgqoajcuqwqoie3b.jpg'];
 
-const longitude = -77.036543;
-const latitude = 38.895037;
+const longitude = [-73.982661, -118.242766, -87.624421, -95.367697, -112.074142, -75.163526, -98.495141, -117.162773, -96.796856, -121.890583, -97.7437, -81.655651, -97.332746, -83.000707, -122.419359, -80.843083, -86.15835, -122.330062, -104.984862, -77.036543]
+const latitude = [40.768722, 34.053691, 41.875562, 29.758938, 33.448437, 39.952724, 29.4246, 32.71742, 32.776272, 37.336191, 30.271129, 30.332184, 32.753177, 39.96226, 37.779238, 35.227209, 39.768333, 47.603832, 39.739236, 38.895037]
 
 const extendedFilenames = [];
 const extendedUrls = [];
@@ -38,8 +38,8 @@ connection.query(`SELECT COUNT(*) AS count FROM campgrounds`, (err, rows) => {
                 price.toFixed(2),
                 descriptions[i],
                 locations[i],
-                longitude,
-                latitude,
+                longitude[i],
+                latitude[i],
                 author
             ]);
         }
